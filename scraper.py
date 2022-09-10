@@ -2,8 +2,7 @@ import json
 import requests
 from bs4 import BeautifulSoup
 
-DIV_CLASS = 'js-store'
-URL = "https://tabs.ultimate-guitar.com/tab/beach-weather/chit-chat-chords-2421111"
+_DIV_CLASS = 'js-store'
 
 def json_from_url(url: str) -> dict:
     """
@@ -17,20 +16,28 @@ def json_from_url(url: str) -> dict:
     
     Returns:
     - the JSON dict of the tab data
+
+    Exceptions:
+    - HTTPError:    if the page request does not return a successful
+                    status code (200-299) then this exception will be raised
     """
+    
     page = requests.get(url)
+    page.raise_for_status()
+
     soup = BeautifulSoup(page.content, "html.parser")
     body = soup.find('body')
     
-    cont = body.find('div', class_=DIV_CLASS)
+    cont = body.find('div', class_=_DIV_CLASS)
     
     data_content = cont["data-content"]
     data_content.replace('&quot;', '\"')
     
     data_content_json = json.loads(data_content)
     return data_content_json
-    # print(data_content_json["store"]["page"]["data"]["tab_view"]["wiki_tab"]["content"])
 
 
-if __name__ == '__main__':
-    json_from_url(URL)
+# for debugging
+def write_dict_to_file(data: dict, path: str) -> None:
+    with open(path, 'w') as f:
+        json.dump(data, f)
