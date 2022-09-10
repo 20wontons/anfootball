@@ -4,6 +4,11 @@ from bs4 import BeautifulSoup
 
 _DIV_CLASS = 'js-store'
 _UG_URI = 'https://tabs.ultimate-guitar.com/tab/'
+_UG_URI_LEN = 37
+
+class InvalidLinkError(Exception):
+    """Raised when the link is not an ultimate-guitar tab link."""
+    pass
 
 def json_from_url(url: str) -> dict:
     """
@@ -23,6 +28,9 @@ def json_from_url(url: str) -> dict:
                     status code (200-299) then this exception will be raised
     """
     
+    if not _link_has_ug_uri(url):
+        raise InvalidLinkError("Link is not a tabs.ultimate-guitar.com link.")
+
     page = requests.get(url)
     page.raise_for_status()
 
@@ -43,3 +51,9 @@ def write_dict_to_file(data: dict, path: str) -> None:
     f = open(path, 'w')
     json.dump(data, f)
     f.close()
+
+def _link_has_ug_uri(url: str) -> bool:
+    try:
+        return url[:_UG_URI_LEN] == _UG_URI
+    except IndexError:
+        return False

@@ -1,4 +1,3 @@
-from random import sample
 import unittest
 
 
@@ -18,14 +17,16 @@ class TestScraper(unittest.TestCase):
         # scraper.write_dict_to_file(scraper.json_from_url(self.url), 'sample/sample_json/chit_chat.json')
         # scraper.write_dict_to_file(scraper.json_from_url(self.url2), 'sample/sample_json/bright.json')
 
-    def test_incorrect_link_raises_http_error(self):
-        self.assertRaises(scraper.requests.HTTPError, 
-            scraper.json_from_url, self.broken_url)
+    def test_invalid_link_raises_InvalidLinkError(self):
+        self.assertRaises(scraper.InvalidLinkError, scraper.json_from_url, 'https://www.google.com/')
+        self.assertRaises(scraper.InvalidLinkError, scraper.json_from_url, 'https://www.youtube.com/watch?v=rogKZtOhg44&list=LL&index=8&ab_channel=Astro%27s2ndchannel')
+
+    def test_incorrect_link_raises_HTTPError(self):
+        self.assertRaises(scraper.requests.HTTPError, scraper.json_from_url, self.broken_url)
     
     def test_link_returns_jsondict(self):
         self.assertTrue(type(scraper.json_from_url(self.url)) == dict)
 
-    #test url that isnt ultimate guitar should raise an exception
 
 
 import parser
