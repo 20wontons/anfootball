@@ -40,5 +40,6 @@ def json_from_url(url: str) -> dict:
 
 # for debugging
 def write_dict_to_file(data: dict, path: str) -> None:
-    with open(path, 'w') as f:
-        json.dump(data, f)
+    f = open(path, 'w')
+    json.dump(data, f)
+    f.close()

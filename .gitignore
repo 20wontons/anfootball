@@ -101,4 +101,3 @@ ENV/
 # mypy
 .mypy_cache/
 workspace/
-sample/sample_json/

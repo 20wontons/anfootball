@@ -23,17 +23,17 @@ class UGTabInfo():
     """
 
     def __init__(self, data: dict):
-        tab_info = data['store']['page']['data']['tab']
-        self._tab_id = tab_info['id']
-        self._tab_url = tab_info['tab_url']
-        self._artist = tab_info['artist_name']
-        self._song = tab_info['song_name']
+        tab_info: dict = data['store']['page']['data']['tab']
+        self._tab_id: int = tab_info['id']
+        self._tab_url: str = tab_info['tab_url']
+        self._artist: str = tab_info['artist_name']
+        self._song: str = tab_info['song_name']
         
         # the following meta fields could be None
-        tab_meta = data['store']['page']['data']['tab_view']['meta']
-        self._tuning = tab_meta.get('tonality')
-        self._key = tab_meta.get('tuning')['value'] if tab_meta.get('tuning') is not None else None
-        self._capo = tab_meta.get('capo')
+        tab_meta: dict = data['store']['page']['data']['tab_view']['meta']
+        self._tuning: str or None = tab_meta.get('tuning')['value'] if tab_meta.get('tuning') is not None else None
+        self._key: str or None = tab_meta.get('tonality')
+        self._capo: int or None = tab_meta.get('capo')
     
     def get_tab_id(self) -> int:
         return self._tab_id
@@ -77,14 +77,16 @@ class UGTab():
 
     def __init__(self, data: dict):
         self._info = UGTabInfo(data)
-        self._content = self._format_content(
-            data['store']['page']['data']['tab_view']['wiki_tab']['content'])
+        self._content = self._format_content(data['store']['page']['data']['tab_view']['wiki_tab']['content'])
+        #print(self._content)
     
-    def _format_content(self, content: str) -> str:
-        content.replace('[ch]', '**' if UGTab.FOR_DISCORD else '')
-        content.replace('[/ch]', '**' if UGTab.FOR_DISCORD else '')
-        content.replace('[tab]', '')
-        content.replace('[/tab]', '')
+    def _format_content(self, content: str) -> None:
+        content = content.replace('[ch]', '**' if UGTab.FOR_DISCORD else '', -1)
+        content = content.replace('[/ch]', '**' if UGTab.FOR_DISCORD else '', -1)
+        content = content.replace('[tab]', '', -1)
+        content = content.replace('[/tab]', '', -1)
+        content = content.replace('\r', '', -1)
+        return content
 
     def get_content(self) -> str:
         return self._content
@@ -92,6 +94,7 @@ class UGTab():
     def write_content_to_file(self, path: str):
         f = open(path, 'w')
         f.write(self._content)
+        f.close()
 
     # getting the tab info
     def get_tab_id(self) -> int:
