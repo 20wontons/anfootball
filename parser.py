@@ -81,8 +81,8 @@ class UGTab():
             data['store']['page']['data']['tab_view']['wiki_tab']['content'])
     
     def _format_content(self, content: str) -> str:
-        content.replace('[ch]', '**' if FOR_DISCORD else '')
-        content.replace('[/ch]', '**' if FOR_DISCORD else '')
+        content.replace('[ch]', '**' if UGTab.FOR_DISCORD else '')
+        content.replace('[/ch]', '**' if UGTab.FOR_DISCORD else '')
         content.replace('[tab]', '')
         content.replace('[/tab]', '')
 

@@ -3,6 +3,7 @@ import requests
 from bs4 import BeautifulSoup
 
 _DIV_CLASS = 'js-store'
+_UG_URI = 'https://tabs.ultimate-guitar.com/tab/'
 
 def json_from_url(url: str) -> dict:
     """
