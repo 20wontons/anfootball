@@ -9,6 +9,7 @@ This bot is able to display the chords and lyrics for a song that the user input
 * https://github.com/joncardasis/ultimate-api
     * found to be incompatible with ultimate guitar (checked on 2022/09/09)
 * https://realpython.com/beautiful-soup-web-scraper-python/
+* https://discord-py-slash-command.readthedocs.io/en/latest/quickstart.html
 
 
 ## Sprints
@@ -24,7 +25,9 @@ This bot is able to display the chords and lyrics for a song that the user input
 
 **Part 2:**
 
-* [ ] Create a Discord bot that can produce output
+* [X] Create a Discord bot that can produce output
+    * Successfully pinged and received a "Pong!" (2022/09/10)
+    <img src='https://cdn.discordapp.com/attachments/821931361681276929/1018394753554972803/unknown.png'/>
 * [ ] The bot can receive input and produce output
 * [ ] The bot can display chord/lyric format
 * [ ] The bot can successfully apply Part 1
@@ -49,10 +52,11 @@ This bot is able to display the chords and lyrics for a song that the user input
     .\venv\Scripts\activate
     ```
 
-1. Install dependancies:
+1. Install dependencies:
 
     ```cmd
     pip install -r requirements.txt
+    pip install -U discord.py
     ```
 
 ## License
