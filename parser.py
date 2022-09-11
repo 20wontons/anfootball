@@ -63,26 +63,22 @@ class UGTab():
     the tab info and metadata, and the tab contents, 
     including the chords and lyrics.
 
-    Class Variables:
-    - FOR_DISCORD: bool   | if True, then the chords in the formatted contents will be bolded by Discord syntax.
-                            if False, then the chords will be plaintext unformatted
-    
     Instance Variables:
     - info:     UGTabInfo | the tab info and metadata, in a UGTabInfo object
     - content:  str       | the tab content, which includes the formatted chords and lyrics
+    - for_discord: bool   | if True, then the chords in the formatted contents will be bolded by Discord syntax.
+                            if False, then the chords will be plaintext unformatted.
     """
 
-    # set to True to bold the chords for Discord
-    FOR_DISCORD = False
-
-    def __init__(self, data: dict):
+    def __init__(self, data: dict, for_discord: bool = False):
         self._info = UGTabInfo(data)
+        self._for_discord = for_discord
         self._content = self._format_content(data['store']['page']['data']['tab_view']['wiki_tab']['content'])
-        #print(self._content)
+        
     
-    def _format_content(self, content: str) -> None:
-        content = content.replace('[ch]', '**' if UGTab.FOR_DISCORD else '', -1)
-        content = content.replace('[/ch]', '**' if UGTab.FOR_DISCORD else '', -1)
+    def _format_content(self, content: str) -> str:
+        content = content.replace('[ch]', '**' if self._for_discord else '', -1)
+        content = content.replace('[/ch]', '**' if self._for_discord else '', -1)
         content = content.replace('[tab]', '', -1)
         content = content.replace('[/tab]', '', -1)
         content = content.replace('\r', '', -1)

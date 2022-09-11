@@ -40,11 +40,16 @@ class TestParser(unittest.TestCase):
         f = open('sample/sample_json/chit_chat.json', 'r')
         data = scraper.json.loads(f.read())
         self.tab = parser.UGTab(data)
+        
         f2 = open('sample/sample_json/bright.json', 'r')
         data2 = scraper.json.loads(f2.read())
         self.tab2 = parser.UGTab(data2)
+
         f.close()
         f2.close()
+
+        self.tab_discord = parser.UGTab(data, for_discord=True)
+        self.tab2_discord = parser.UGTab(data2, for_discord=True)
 
     def test_tab_info_values_are_correct_values(self):
         # Beach Weather - Chit Chat
@@ -77,6 +82,13 @@ class TestParser(unittest.TestCase):
         self.assertEqual(-1, tab2_content.find("[/ch]"))
         self.assertEqual(-1, tab2_content.find("[tab]"))
         self.assertEqual(-1, tab2_content.find("[/tab]"))
+
+    def test_content_is_formatted_for_discord(self):
+        tab_content = self.tab_discord.get_content()
+        self.assertNotEqual(-1, tab_content.find("**"))
+
+        tab2_content = self.tab2_discord.get_content()
+        self.assertNotEqual(-1, tab2_content.find("**"))
     
     def test_content_is_correct(self):
         f = open('sample/chit_chat.txt', 'r')

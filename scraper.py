@@ -26,6 +26,7 @@ def json_from_url(url: str) -> dict:
     Exceptions:
     - HTTPError:    if the page request does not return a successful
                     status code (200-299) then this exception will be raised
+    - InvalidLinkError: Raised when the link is not an ultimate-guitar tab link.
     """
     
     if not _link_has_ug_uri(url):
