@@ -33,7 +33,9 @@ This bot is able to display the chords and lyrics for a song that the user input
 * [X] The bot can display chord/lyric format
     * Successfully able to display chord/lyric format in a code block, limited to 2000 chars. (2022/09/11)
     <img src='https://cdn.discordapp.com/attachments/821931361681276929/1018604956909043822/unknown.png'/>
-* [ ] The bot can successfully apply Part 1
+* [X] The bot can successfully apply Part 1
+    * Successfully able to display tab in an embed. (2022/09/11)
+    <img src='https://cdn.discordapp.com/attachments/821931361681276929/1018748075738681374/unknown.png'/>
 
 **Part 3: Search Feature**
 
@@ -45,7 +47,7 @@ This bot is able to display the chords and lyrics for a song that the user input
 **Part 4: Additional Features**
 
 * [ ] Allow for transposition of songs
-* [ ] Support Tab types in addition to Chords
+* [ ] Support for Tabs. Differentiated from chords by the search results and lack of transposition ability
 
 
 ## Setup
@@ -64,6 +66,7 @@ This bot is able to display the chords and lyrics for a song that the user input
     ```cmd
     pip install -r requirements.txt
     pip install -U discord.py
+    pip install -U discord-py-interactions
     ```
 
 ## License

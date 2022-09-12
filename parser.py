@@ -1,5 +1,3 @@
-
-
 class UGTabInfo():
     """
     An Ultimate-Guitar Tab Info object, which defines
@@ -113,3 +111,13 @@ class UGTab():
 
     def get_capo(self) -> int or None:
         return self._info.get_capo()
+
+    def get_formatted_metadata(self) -> str:
+        md = []
+        if self.get_tuning() is not None:
+            md.append("Tuning: " + self.get_tuning())
+        if self.get_key() is not None:
+            md.append("Key: " + self.get_key())
+        if self.get_capo() is not None:
+            md.append("Capo: " + str(self.get_capo()))
+        return '\n'.join(md)

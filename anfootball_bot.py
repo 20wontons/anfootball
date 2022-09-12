@@ -1,6 +1,9 @@
 import interactions
 
-import interface
+from scraper import json_from_url, InvalidLinkError, requests
+from parser import UGTab
+
+UG_YELLOW = 0xffc600
 
 import os
 from dotenv import load_dotenv
@@ -20,6 +23,7 @@ bot = interactions.Client(token=_token)
 )
 async def ping(ctx):
     await ctx.send("Pong!")
+
 
 @bot.command(
     name = "chords",
@@ -41,38 +45,26 @@ async def ping(ctx):
 )
 async def chords(ctx, url: str):#, transpose: int = 0):
     try:
-        ch = "```" + interface.get_chords(url)[:1000] + "```"
-        await ctx.send(ch)
-    except interface.scraper.InvalidLinkError:
+        ugchords = UGTab(json_from_url(url))
+        embed = interactions.Embed(
+            title = ugchords.get_artist() + " - " + ugchords.get_song(),
+            url = ugchords.get_tab_url(),
+            description = "```" + ugchords.get_content() + "```",
+            color = UG_YELLOW
+        )
+        embed.set_footer(text=ugchords.get_formatted_metadata())
+        
+        await ctx.send(embeds=embed)
+    except InvalidLinkError:
         # Ephemeral message for invalid Links
         await ctx.send("This is not a valid `tabs.ultimate-guitar.com/tabs/` link.", ephemeral=True)
-    except interface.scraper.requests.HTTPError:
+    except requests.HTTPError:
         # Ephemeral message for unsuccessful HTTP connections
         await ctx.send("Unsuccessful connection. Try again later.", ephemeral=True)
-    except Exception as e:
-        # Ephemeral message for all other errors
-        print(e.with_traceback())
-        await ctx.send("Something went wrong.", ephemeral=True)
+    # except Exception as e:
+    #     # Ephemeral message for all other errors
+    #     print(e)
+    #     await ctx.send("Something went wrong.", ephemeral=True)
 
 
 bot.start()
-
-
-
-
-### Not for slash commands ###
-
-# import discord
-# from discord.ext import commands
-
-# bot = commands.Bot(command_prefix='&')
-
-# @bot.event
-# async def on_ready():
-#     print("Logged in as a bot {0.user}".format(bot))
-
-# @bot.command()
-# async def ping(ctx):
-#     await ctx.send('Pong!')
-
-# bot.run(token)
