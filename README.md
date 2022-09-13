@@ -10,6 +10,7 @@ This bot is able to display the chords and lyrics for a song that the user input
     * found to be incompatible with ultimate guitar (checked on 2022/09/09)
 * https://realpython.com/beautiful-soup-web-scraper-python/
 * https://discord-py-slash-command.readthedocs.io/en/latest/quickstart.html
+* https://github.com/interactions-py
 
 
 ## Sprints
@@ -43,8 +44,12 @@ This bot is able to display the chords and lyrics for a song that the user input
     * Successfully able to scrape for the results and return a JSON (2022/09/12)
 * [X] Inputting an artist and song will return the first 5 (at most) chord results
     * Successfully able to input artist/song and filter for chords (2022/09/12) 
-* [ ] The Discord bot will be able to receive artist - song input and return a list of the results
-* [ ] When the user chooses one of those results, the bot will correctly display the chord/lyric format for that specific chord tab
+* [X] The Discord bot will be able to receive artist - song input and return a list of the results
+    * Displays a 10 page (at most) list of at most 5 Chords and 5 Tabs. (2022/09/12)
+    * *Known issue: "This interaction failed." shows up whenever any buttons are pressed*
+* [X] When the user chooses one of those results, the bot will correctly display the chord/lyric format for that specific chord tab
+    * Successfully displays the chords format when the user chooses that result option (2022/09/12)
+
 
 **Part 4: Additional Features**
 
@@ -64,12 +69,14 @@ This bot is able to display the chords and lyrics for a song that the user input
     ```
 
 1. Install dependencies:
-
+    
     ```cmd
     pip install -r requirements.txt
-    pip install -U discord.py
     pip install -U discord-py-interactions
+    pip install -U interactions-wait-for
     ```
+
+    **Note:** `discord.py` is not used for slash commands so `pip install -U discord.py` is not needed. 
 
 ## License
 

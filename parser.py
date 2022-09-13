@@ -67,7 +67,7 @@ class UGTab():
     - for_discord: bool   | if True, then the chords in the formatted contents will be bolded by Discord syntax.
                             if False, then the chords will be plaintext unformatted.
     """
-
+    # TODO: add version description
     def __init__(self, data: dict, for_discord: bool = False):
         self._info: UGTabInfo = UGTabInfo(data)
         self._for_discord: bool = for_discord
@@ -127,7 +127,7 @@ class UGSearchResult():
     """
     An Ultimate-Guitar Search Result object, 
     which defines all of the metadata for a search result;
-    only supported for Chords and Tab types
+    only supported for Chords and Tabs types
     
     Instance Variables:
     - tab_url:  str   | the url to the tab
@@ -163,16 +163,25 @@ class UGSearchResult():
     def get_rating(self) -> float:
         return self._rating
 
+    def get_formatted_result_description(self) -> str:
+        # TODO: add version description
+        return f"**Rating:** `{self._rating}`\n" \
+                + f"**Votes:** `{self._votes}`\n\n" \
+                + f"**Link**\n{self._tab_url}"
+
 
 class UGSearch():
     """
     An Ultimate-Guitar Search object,
     which parses the search results from a JSON,
-    and can return the Chords results or Tab results.
+    and can return the Chords results or Tabs results.
 
     Instance Variables:
     - raw_results:  list[dict]  | the search results as a list of results with data
     """
+    # TODO: maybe look into https://stats.stackexchange.com/questions/6418/rating-system-taking-account-of-number-of-votes
+    sort_key = lambda x: x.get_votes()
+
     def __init__(self, data: dict):
         self._raw_results: list[dict] = data["store"]["page"]["data"]["results"]
 
@@ -184,14 +193,16 @@ class UGSearch():
                     ch_r.append(UGSearchResult(r))
             except KeyError:
                 pass
+        ch_r.sort(reverse=True, key=UGSearch.sort_key)
         return ch_r
     
     def get_tab_results(self) -> list[UGSearchResult]:
         t_r = []
         for r in self._raw_results:
             try:
-                if r['type'] == "Tab":
+                if r['type'] == "Tabs":
                     t_r.append(UGSearchResult(r))
             except KeyError:
                 pass
+        t_r.sort(reverse=True, key=UGSearch.sort_key)
         return t_r
