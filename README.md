@@ -46,7 +46,8 @@ This bot is able to display the chords and lyrics for a song that the user input
     * Successfully able to input artist/song and filter for chords (2022/09/12) 
 * [X] The Discord bot will be able to receive artist - song input and return a list of the results
     * Displays a 10 page (at most) list of at most 5 Chords and 5 Tabs. (2022/09/12)
-    * *Known issue: "This interaction failed." shows up whenever any buttons are pressed*
+    * ~~*Known issue: "This interaction failed." shows up whenever any buttons are pressed*~~
+        * Fixed! (2022/09/13)
 * [X] When the user chooses one of those results, the bot will correctly display the chord/lyric format for that specific chord tab
     * Successfully displays the chords format when the user chooses that result option (2022/09/12)
 

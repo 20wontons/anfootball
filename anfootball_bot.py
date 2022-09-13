@@ -120,9 +120,9 @@ async def search(ctx: interactions.context._Context, artist: str, song: str):
         
         try:
             while True:
-                # FIXME: after pressing any button it says "This interaction failed." but still works
                 button_ctx: interactions.ComponentContext = await bot.wait_for_component(
-                    components=[search_left_button, search_choose_button, search_right_button], timeout=60
+                    components=[search_left_button, search_choose_button, search_right_button], 
+                    timeout=60
                 )
                 if button_ctx.custom_id == "next":
                     page += 1
@@ -134,9 +134,9 @@ async def search(ctx: interactions.context._Context, artist: str, song: str):
                 search_row.components[0].disabled=page == 0
                 search_row.components[2].disabled=page == PAGE_MAX
 
-                await ctx.edit(embeds=results_embeds[page], components=search_row)
+                await button_ctx.edit(embeds=results_embeds[page], components=search_row)
         except asyncio.TimeoutError:
-            return await ctx.edit(components=[])
+            return await ctx.edit(embeds=results_embeds[page], components=[])
         
         url = results[page].get_tab_url()
         ugchords = UGTab(json_from_url(url))
@@ -149,7 +149,6 @@ async def search(ctx: interactions.context._Context, artist: str, song: str):
         embed.set_footer(text=ugchords.get_formatted_metadata())
         
         await ctx.edit(embeds=embed, components=[])
-
         
     except InvalidLinkError:
         # Ephemeral message for invalid Links
