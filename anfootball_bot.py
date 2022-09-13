@@ -17,9 +17,31 @@ load_dotenv()
 # token is in a file called .env
 # TOKEN = '<BOT_TOKEN>'
 _token = os.getenv('TOKEN')
+_ready: bool = False
 
 bot = interactions.Client(token=_token)
 setup(bot)
+
+
+@bot.event
+async def on_ready():
+    global _ready
+    if not _ready:
+        # sets listening status to "Listening to Never Meant"
+        await bot.change_presence(
+            presence=interactions.ClientPresence(
+                activities=[interactions.PresenceActivity(
+                    name="Never Meant",
+                    type=interactions.PresenceActivityType.LISTENING,
+                    # created_at=1662794760,
+                    # details="americ anfootball",
+                )]
+            )
+        )
+        _ready = True
+    
+
+
 
 @bot.command(
     name = "ping",
@@ -108,7 +130,7 @@ async def search(ctx: interactions.context._Context, artist: str, song: str):
     try:
         # Gets the highest voted 5 chord results and 5 tab results
         ugsearch = UGSearch(json_from_search(artist, song))
-        results = ugsearch.get_chords_results()[:5] + ugsearch.get_tab_results()[:5]
+        results = ugsearch.get_chords_results()[:5] + ugsearch.get_tabs_results()[:5]
         results_embeds = _format_results_embeds(results)
         
         page = 0

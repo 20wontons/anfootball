@@ -78,12 +78,14 @@ def json_from_search(artist: str, song: str) -> dict:
 
 # for debugging
 def write_dict_to_file(data: dict, path: str) -> None:
+    """Writes the JSON dict to a file."""
     f = open(path, 'w')
     json.dump(data, f)
     f.close()
 
 
 def _link_has_ug_uri(url: str) -> bool:
+    """Checks if the given URL contains an ultimate-guitar tab or search URI."""
     try:
         return url[:_UG_TAB_URI_LEN] == _UG_TAB_URI or url[:_UG_SEARCH_URI_LEN] == _UG_SEARCH_URI
     except IndexError:
