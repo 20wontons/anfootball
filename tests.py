@@ -16,6 +16,8 @@ class TestScraper(unittest.TestCase):
         # Writes JSON to files, uncomment for debug
         # scraper.write_dict_to_file(scraper.json_from_url(self.url), 'sample/sample_json/chit_chat.json')
         # scraper.write_dict_to_file(scraper.json_from_url(self.url2), 'sample/sample_json/bright.json')
+        # scraper.write_dict_to_file(scraper.json_from_search("beach weather", "chit chat"), 'sample/sample_json/chit_chat_search.json')
+        # scraper.write_dict_to_file(scraper.json_from_search("oasis", "wonderwall"), 'sample/sample_json/wonderwall_search.json')
 
     def test_invalid_link_raises_InvalidLinkError(self):
         self.assertRaises(scraper.InvalidLinkError, scraper.json_from_url, 'https://www.google.com/')

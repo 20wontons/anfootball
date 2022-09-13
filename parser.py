@@ -69,9 +69,9 @@ class UGTab():
     """
 
     def __init__(self, data: dict, for_discord: bool = False):
-        self._info = UGTabInfo(data)
-        self._for_discord = for_discord
-        self._content = self._format_content(data['store']['page']['data']['tab_view']['wiki_tab']['content'])
+        self._info: UGTabInfo = UGTabInfo(data)
+        self._for_discord: bool = for_discord
+        self._content: str = self._format_content(data['store']['page']['data']['tab_view']['wiki_tab']['content'])
         
     
     def _format_content(self, content: str) -> str:
@@ -121,3 +121,77 @@ class UGTab():
         if self.get_capo() is not None:
             md.append("Capo: " + str(self.get_capo()))
         return '\n'.join(md)
+
+
+class UGSearchResult():
+    """
+    An Ultimate-Guitar Search Result object, 
+    which defines all of the metadata for a search result;
+    only supported for Chords and Tab types
+    
+    Instance Variables:
+    - tab_url:  str   | the url to the tab
+    - artist:   str   | the artist name that wrote the song
+    - song:     str   | the song title
+    - type:     str   | could be Chords or Tab
+    - votes:    int   | the number of votes for the tab
+    - rating:   float | the rating for the tab, out of 5
+    """
+    def __init__(self, data: dict):
+        self._tab_url: str = data['tab_url']
+        self._artist: str = data['artist_name']
+        self._song: str = data['song_name']
+        self._type: str = data['type']
+        self._votes: int = data['votes']
+        self._rating: float = data['rating']
+    
+    def get_tab_url(self) -> str:
+        return self._tab_url
+    
+    def get_artist(self) -> str:
+        return self._artist
+    
+    def get_song(self) -> str:
+        return self._song
+    
+    def get_type(self) -> str:
+        return self._type
+    
+    def get_votes(self) -> int:
+        return self._votes
+    
+    def get_rating(self) -> float:
+        return self._rating
+
+
+class UGSearch():
+    """
+    An Ultimate-Guitar Search object,
+    which parses the search results from a JSON,
+    and can return the Chords results or Tab results.
+
+    Instance Variables:
+    - raw_results:  list[dict]  | the search results as a list of results with data
+    """
+    def __init__(self, data: dict):
+        self._raw_results: list[dict] = data["store"]["page"]["data"]["results"]
+
+    def get_chords_results(self) -> list[UGSearchResult]: 
+        ch_r = []
+        for r in self._raw_results:
+            try:
+                if r['type'] == "Chords":
+                    ch_r.append(UGSearchResult(r))
+            except KeyError:
+                pass
+        return ch_r
+    
+    def get_tab_results(self) -> list[UGSearchResult]:
+        t_r = []
+        for r in self._raw_results:
+            try:
+                if r['type'] == "Tab":
+                    t_r.append(UGSearchResult(r))
+            except KeyError:
+                pass
+        return t_r

@@ -39,8 +39,10 @@ This bot is able to display the chords and lyrics for a song that the user input
 
 **Part 3: Search Feature**
 
-* [ ] Make a web scraper for the search results on ultimate guitar that only returns chord type results
-* [ ] Inputting an artist and song will return the first 5 (at most) chord results
+* [X] Make a web scraper for the search results on ultimate guitar that only returns chord type results
+    * Successfully able to scrape for the results and return a JSON (2022/09/12)
+* [X] Inputting an artist and song will return the first 5 (at most) chord results
+    * Successfully able to input artist/song and filter for chords (2022/09/12) 
 * [ ] The Discord bot will be able to receive artist - song input and return a list of the results
 * [ ] When the user chooses one of those results, the bot will correctly display the chord/lyric format for that specific chord tab
 
