@@ -5,6 +5,7 @@ class UGTabInfo():
     
     Instance Variables:
     - tab_id:   int   | the id of the specific tab
+    - type:     str   | the type of tab (Chords or Tabs)
     - tab_url:  str   | the url to the tab
     - artist:   str   | the artist name that wrote the song
     - song:     str   | the song title
@@ -23,6 +24,7 @@ class UGTabInfo():
     def __init__(self, data: dict):
         tab_info: dict = data['store']['page']['data']['tab']
         self._tab_id: int = tab_info['id']
+        self._type: str = tab_info['type']
         self._tab_url: str = tab_info['tab_url']
         self._artist: str = tab_info['artist_name']
         self._song: str = tab_info['song_name']
@@ -35,6 +37,9 @@ class UGTabInfo():
     
     def get_tab_id(self) -> int:
         return self._tab_id
+    
+    def get_type(self) -> str:
+        return self._type
     
     def get_tab_url(self) -> str:
         return self._tab_url
@@ -94,6 +99,9 @@ class UGTab():
     def get_tab_id(self) -> int:
         return self._info.get_tab_id()
     
+    def get_type(self) -> int:
+        return self._info.get_type()
+    
     def get_tab_url(self) -> str:
         return self._info.get_tab_url()
     
@@ -113,7 +121,7 @@ class UGTab():
         return self._info.get_capo()
 
     def get_formatted_metadata(self) -> str:
-        md = []
+        md = [self.get_type()+" ID: "+str(self.get_tab_id())]
         if self.get_tuning() is not None:
             md.append("Tuning: " + self.get_tuning())
         if self.get_key() is not None:
@@ -138,6 +146,7 @@ class UGSearchResult():
     - rating:   float | the rating for the tab, out of 5
     """
     def __init__(self, data: dict):
+        self._tab_id: int = data['id']
         self._tab_url: str = data['tab_url']
         self._artist: str = data['artist_name']
         self._song: str = data['song_name']
@@ -145,6 +154,9 @@ class UGSearchResult():
         self._votes: int = data['votes']
         self._rating: float = data['rating']
     
+    def get_tab_id(self) -> str:
+        return self._tab_id
+
     def get_tab_url(self) -> str:
         return self._tab_url
     
@@ -167,6 +179,7 @@ class UGSearchResult():
         # TODO: add version description
         return f"**Rating:** `{self._rating}`\n" \
                 + f"**Votes:** `{self._votes}`\n\n" \
+                + f"**ID:** `{self._tab_id}`\n" \
                 + f"**Link**\n{self._tab_url}"
 
 

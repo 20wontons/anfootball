@@ -13,6 +13,18 @@ This bot is able to display the chords and lyrics for a song that the user input
 * https://github.com/interactions-py
 
 
+## Commands
+**Parameters:** `<>` - required, `[]` - optional, `|` - either/or
+Do not include `<>` , `[]` or `|` when executing the command.
+| Usage | Description |
+| ------- | ----- |
+| `/chords <artist> <song>` | Finds the highest voted Chords tab for a song. |
+| `/tabs <artist> <song>` | Finds the highest voted Tabs tab for a song. |
+| `/search <all|chords|tabs> <artist> <song>` | Search for a song. |
+| `/nevermeant` | The americ anfootball lick. |
+| `/ping` | Pings the bot. |
+
+
 ## Sprints
 
 **Part 1: Web Scraper**
@@ -55,7 +67,13 @@ This bot is able to display the chords and lyrics for a song that the user input
 **Part 4: Additional Features**
 
 * [ ] Allow for transposition of songs
-* [ ] Support for Tabs. Differentiated from chords by the search results and lack of transposition ability
+* [X] Support for Tabs. Differentiated from chords by the search results and lack of transposition ability
+    * Added `/tabs` (2022/09/15)
+* [X] Subcommands for search: search chords and search tabs
+    * Main search function renamed to `/search all` and added `/search chords` and `/search tabs`
+* [ ] Able to display a specific Chords/Tabs tab by ID
+* [ ] Add a function to browse top 10 popular today and all time
+* [ ] Search for an artist, able to return most popular songs, or most recent tabs
 
 
 ## Setup
