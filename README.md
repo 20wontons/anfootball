@@ -14,8 +14,8 @@ This bot is able to display the chords and lyrics for a song that the user input
 
 
 ## Commands
-**Parameters:** `<>` - required, `[]` - optional, `\` - either/or
-Do not include `<>` , `[]` or `\` when executing the command.
+**Parameters:** `<>` - required, `[]` - optional, `|` - either/or
+Do not include `<>` , `[]` or `|` when executing the command.
 | Usage | Description |
 | ------- | ----- |
 | `/chords <artist> <song>` | Finds the highest voted Chords tab for a song. |
