@@ -7,7 +7,7 @@ import asyncio
 from server import keep_alive
 
 from scraper import json_from_search, json_from_url, InvalidLinkError, requests
-from parser import UGTab, UGSearch, UGSearchResult
+from parser import UGTab, UGSearch, UGSearchResult, UGChords
 
 UG_YELLOW = 0xffc600
 
@@ -60,7 +60,7 @@ async def ping(ctx):
 )
 async def nevermeant(ctx):
     try:
-        url = "https://youtu.be/_NfnXdXpjL0"
+        url = "https://tabs.ultimate-guitar.com/tab/american-football/never-meant-tabs-979718"
         ugtabs = UGTab(json_from_url(url))
         NM_GREEN = 0x606E36
 
@@ -131,25 +131,27 @@ nm_display_full_button = interactions.Button(
             type = interactions.OptionType.STRING,
             required = True
         ),
+        interactions.Option(
+            name = "transpose",
+            description = "The number of semitones to change the tonality of the song",
+            type = interactions.OptionType.INTEGER,
+            required = False,
+        ),
         # interactions.Option(
         #     name = "url",
         #     description = "The URL for the Ultimate Guitar Tab",
         #     type = interactions.OptionType.STRING,
         #     required = True,
         # ),
-        # interactions.Option(
-        #     name = "transpose",
-        #     description = "Change the key (and chords) of the song.",
-        #     type = interactions.OptionType.INTEGER,
-        #     required = False,
-        # ),
     ],
 )
-async def chords(ctx, artist: str, song: str):#url: str, transpose: int = 0):
+async def chords(ctx, artist: str, song: str, transpose: int = 0): #url: str
     try:
         # Takes the first result in the sorted results listing.
         url = UGSearch(json_from_search(artist, song)).get_chords_results()[0].get_tab_url()
-        ugchords = UGTab(json_from_url(url))
+        ugchords = UGChords(json_from_url(url))
+        ugchords.transpose(transpose)
+        
         embed = _format_tab_embed(ugchords)
         
         await ctx.send(embeds=embed)
@@ -158,7 +160,8 @@ async def chords(ctx, artist: str, song: str):#url: str, transpose: int = 0):
         await ctx.send("This is not a valid `tabs.ultimate-guitar.com/tabs/` link.", ephemeral=True)
     except requests.HTTPError as e:
         # Ephemeral message for unsuccessful HTTP connections
-        await ctx.send(e, ephemeral=True)
+        # TODO: say 404 error is tab not found
+        await ctx.send(f"Unsuccessful connection: {e}. Try again later.", ephemeral=True)
     # except Exception as e:
     #     # Ephemeral message for all other errors
     #     print(e)
@@ -198,7 +201,7 @@ async def tabs(ctx, artist: str, song: str):
         await ctx.send("This is not a valid `tabs.ultimate-guitar.com/tabs/` link.", ephemeral=True)
     except requests.HTTPError as e:
         # Ephemeral message for unsuccessful HTTP connections
-        await ctx.send(e, ephemeral=True)
+        await ctx.send(f"Unsuccessful connection: {e}. Try again later.", ephemeral=True)
     # except Exception as e:
     #     # Ephemeral message for all other errors
     #     print(e)

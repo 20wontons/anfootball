@@ -63,25 +63,22 @@ class UGTabInfo():
 class UGTab():
     """
     An Ultimate-Guitar Tab object, which defines
-    the tab info and metadata, and the tab contents, 
-    including the chords and lyrics.
+    the tab info and metadata, and the tab contents.
 
     Instance Variables:
     - info:     UGTabInfo | the tab info and metadata, in a UGTabInfo object
     - content:  str       | the tab content, which includes the formatted chords and lyrics
-    - for_discord: bool   | if True, then the chords in the formatted contents will be bolded by Discord syntax.
-                            if False, then the chords will be plaintext unformatted.
     """
     # TODO: add version description
-    def __init__(self, data: dict, for_discord: bool = False):
+    def __init__(self, data: dict):
         self._info: UGTabInfo = UGTabInfo(data)
-        self._for_discord: bool = for_discord
         self._content: str = self._format_content(data['store']['page']['data']['tab_view']['wiki_tab']['content'])
         
     
-    def _format_content(self, content: str) -> str:
-        content = content.replace('[ch]', '**' if self._for_discord else '', -1)
-        content = content.replace('[/ch]', '**' if self._for_discord else '', -1)
+    def _format_content(self, content: str, fchords: bool = True) -> str:
+        if fchords:
+            content = content.replace('[ch]', '', -1)
+            content = content.replace('[/ch]', '', -1)
         content = content.replace('[tab]', '', -1)
         content = content.replace('[/tab]', '', -1)
         content = content.replace('\r', '', -1)
@@ -129,6 +126,77 @@ class UGTab():
         if self.get_capo() is not None:
             md.append("Capo: " + str(self.get_capo()))
         return '\n'.join(md)
+
+
+
+class UGChords(UGTab):
+    """
+    An Ultimate-Guitar Tab object, which defines
+    the tab info and metadata, and the tab contents, 
+    including the chords and lyrics.
+    Inherits from UGTab.
+
+    Class Variables:
+    - tonalities          | The available chord names
+
+    Instance Variables:
+    - content_with_chords | The content still with '[ch]' and '[/ch]' surrounding the chords
+    - transposition       | The integer by which the song's chords will be transposed
+    """
+    tonalities = ["A","Bb","B","C","Db","D","Eb","E","F","Gb","G","Ab"]
+
+    def __init__(self, data: dict):
+        self._info: UGTabInfo = UGTabInfo(data)
+        self._content_with_chords: str = self._format_content(data['store']['page']['data']['tab_view']['wiki_tab']['content'], fchords=False)
+        self._content: str = self._format_content(self._content_with_chords)
+        self._chords_og: list[str] = list(data['store']['page']['data']['tab_view']['applicature'].keys())
+        self._transposition: int = 0
+    
+    def transpose(self, transposition: int = 0) -> None:
+        self._transposition = transposition%12
+        if self._transposition == 0:
+            self._content_with_chords: str = self._format_content(self._content_with_chords, fchords=True)
+            return
+        #FIXME: How to deal with sharps / flats
+        content = self._content_with_chords
+        for c in self._chords_og:
+            new_chord = c
+            slash_i = new_chord.find('/')
+            if slash_i != -1:
+                try:
+                    new_chord = UGChords.tonalities[(UGChords.tonalities.index(c[:slash_i][:2])+self._transposition)%12] \
+                        + c[2:slash_i] \
+                        + UGChords.tonalities[(UGChords.tonalities.index(c[slash_i+1:])+self._transposition)%12]
+                except ValueError:
+                    try:
+                        new_chord = UGChords.tonalities[(UGChords.tonalities.index(c[:slash_i][0])+self._transposition)%12] \
+                            + c[1:slash_i] \
+                            + UGChords.tonalities[(UGChords.tonalities.index(c[slash_i+1:])+self._transposition)%12]
+                    except ValueError:
+                        pass
+            else:
+                try:
+                    new_chord = UGChords.tonalities[(UGChords.tonalities.index(c[:2])+self._transposition)%12] \
+                        + c[2:]
+                except ValueError:
+                    try:
+                        new_chord = UGChords.tonalities[(UGChords.tonalities.index(c[0])+self._transposition)%12] \
+                            + c[1:]
+                    except ValueError:
+                        pass
+            content = content.replace(
+                f"[ch]{c}[/ch]",
+                new_chord
+            )
+            
+        self._content = content
+    
+    def get_transposition(self) -> int:
+        return self._transposition
+    
+    def get_formatted_metadata(self) -> str:
+        return super().get_formatted_metadata() + "\nTransposition: " + str(self.get_transposition())  
+
 
 
 class UGSearchResult():

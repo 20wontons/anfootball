@@ -14,8 +14,8 @@ This bot is able to display the chords and lyrics for a song that the user input
 
 
 ## Commands
-**Parameters:** `<>` - required, `[]` - optional, `|` - either/or
-Do not include `<>` , `[]` or `|` when executing the command.
+**Parameters:** `<>` - required, `[]` - optional, `\` - either/or
+Do not include `<>` , `[]` or `\` when executing the command.
 | Usage | Description |
 | ------- | ----- |
 | `/chords <artist> <song>` | Finds the highest voted Chords tab for a song. |
@@ -66,7 +66,8 @@ Do not include `<>` , `[]` or `|` when executing the command.
 
 **Part 4: Additional Features**
 
-* [ ] Allow for transposition of songs
+* [X] Allow for transposition of songs
+    * Chords can now be transposed by the `transpose:` option in `/chords`, but needs work on dealing with sharps and flats (2022/09/19)
 * [X] Support for Tabs. Differentiated from chords by the search results and lack of transposition ability
     * Added `/tabs` (2022/09/15)
 * [X] Subcommands for search: search chords and search tabs
