@@ -1,7 +1,9 @@
 # Anfootball: Ultimate-Guitar Discord Bot
 
 ![Python-Version](https://img.shields.io/badge/Python-3.10.7-blue.svg)
+
 Anfootball is a Discord bot that retrieves chords, tabs, and lyrics for a specified song from [Ultimate-Guitar](https://www.ultimate-guitar.com/).
+
 🎸🎸🎸
 
 
