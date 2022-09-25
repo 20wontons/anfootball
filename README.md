@@ -1,16 +1,8 @@
-# Ultimate Guitar Discord Bot
-
-This bot is able to display the chords and lyrics for a song that the user inputs.
+# Anfootball: Ultimate-Guitar Discord Bot
 
 ![Python-Version](https://img.shields.io/badge/Python-3.10.7-blue.svg)
-
-**References:**
-
-* https://github.com/joncardasis/ultimate-api
-    * found to be incompatible with ultimate guitar (checked on 2022/09/09)
-* https://realpython.com/beautiful-soup-web-scraper-python/
-* https://discord-py-slash-command.readthedocs.io/en/latest/quickstart.html
-* https://github.com/interactions-py
+Anfootball is a Discord bot that retrieves chords, tabs, and lyrics for a specified song from [Ultimate-Guitar](https://www.ultimate-guitar.com/).
+🎸🎸🎸
 
 
 ## Commands
@@ -18,11 +10,22 @@ This bot is able to display the chords and lyrics for a song that the user input
 Do not include `<>` , `[]` or `\` when executing the command.
 | Usage | Description |
 | ------- | ----- |
-| `/chords <artist> <song>` | Finds the highest voted Chords tab for a song. |
+| `/chords <artist> <song> [transpose]` | Finds the highest voted Chords tab for a song.<br>Transpose to change the key of the song `(beta)`. |
 | `/tabs <artist> <song>` | Finds the highest voted Tabs tab for a song. |
 | `/search <all\chords\tabs> <artist> <song>` | Search for a song. |
 | `/nevermeant` | The americ anfootball lick. |
 | `/ping` | Pings the bot. |
+
+
+## Images
+
+<img src="https://pbs.twimg.com/media/FdeYINYUYAAz4Dv?format=png&name=small" width=300 alt="/chords artist:Hot Mulligan song:Pop Shuvit Hall of Meat Duh"/>
+<br>
+<img src="https://pbs.twimg.com/media/FdeYOJ7UUAA9hhZ?format=png&name=small" width=300 alt="/tabs artist:Chinese Football song: Electronic Girl"/>
+<br>
+<img src="https://pbs.twimg.com/media/FdeYd46UUAAVG7J?format=png&name=small" width=300 alt="/search all artist:Jimmy Eat World song:The Middle"/>
+
+
 
 
 ## Sprints
@@ -40,15 +43,12 @@ Do not include `<>` , `[]` or `\` when executing the command.
 
 * [X] Create a Discord bot that can produce output
     * Successfully pinged and received a "Pong!" (2022/09/10)
-    <img src='https://cdn.discordapp.com/attachments/821931361681276929/1018394753554972803/unknown.png'/>
 * [X] The bot can receive input and produce output
     * Successfully able to receive input and respond (2022/09/11)
 * [X] The bot can display chord/lyric format
     * Successfully able to display chord/lyric format in a code block, limited to 2000 chars. (2022/09/11)
-    <img src='https://cdn.discordapp.com/attachments/821931361681276929/1018604956909043822/unknown.png'/>
 * [X] The bot can successfully apply Part 1
     * Successfully able to display tab in an embed. (2022/09/11)
-    <img src='https://cdn.discordapp.com/attachments/821931361681276929/1018748075738681374/unknown.png'/>
 
 **Part 3: Search Feature**
 
@@ -75,6 +75,15 @@ Do not include `<>` , `[]` or `\` when executing the command.
 * [ ] Able to display a specific Chords/Tabs tab by ID
 * [ ] Add a function to browse top 10 popular today and all time
 * [ ] Search for an artist, able to return most popular songs, or most recent tabs
+
+
+## References
+
+* https://github.com/joncardasis/ultimate-api
+    * found to be incompatible with ultimate guitar (checked on 2022/09/09)
+* https://realpython.com/beautiful-soup-web-scraper-python/
+* https://discord-py-slash-command.readthedocs.io/en/latest/quickstart.html
+* https://github.com/interactions-py
 
 
 ## Setup
