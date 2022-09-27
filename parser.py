@@ -31,9 +31,9 @@ class UGTabInfo():
         
         # the following meta fields could be None
         tab_meta: dict = data['store']['page']['data']['tab_view']['meta']
-        self._tuning: str or None = tab_meta.get('tuning')['value'] if tab_meta.get('tuning') is not None else None
-        self._key: str or None = tab_meta.get('tonality')
-        self._capo: int or None = tab_meta.get('capo')
+        self._tuning: str or None = tab_meta.get('tuning')['value'] if type(tab_meta) is dict and tab_meta.get('tuning') is not None else None
+        self._key: str or None = tab_meta.get('tonality') if type(tab_meta) is dict else None
+        self._capo: int or None = tab_meta.get('capo') if type(tab_meta) is dict else None
     
     def get_tab_id(self) -> int:
         return self._tab_id
@@ -145,6 +145,21 @@ class UGChords(UGTab):
     """
     tonalities = ["A","Bb","B","C","Db","D","Eb","E","F","Gb","G","Ab"]
 
+    keys = {
+        'Ab': ['Ab','Bb','C','Db','Eb','F','G'],
+        'A': ['A','B','C#','D','E','F#','G#'],
+        'Bb': ['Bb','C','D','Eb','F','G','A'],
+        'B': ['B','C#','D#','E','F#','G#','A#'],
+        'C': ['C','D','E','F','G','A','B'],
+        'Db': ['Db','Eb','F','Gb','Ab','Bb','C'],
+        'D': ['D','E','F#','G','A','B','C#'],
+        'Eb': ['Eb','F','G','Ab','Bb','C','D'],
+        'E': ['E','F#','G#','A','B','C#','D#'],
+        'F': ['F','G','A','Bb','C','D','E'],
+        'F#': ['F#','G#','A#','B','C#','D#','E#'],
+        'G': ['G','A','B','C','D','E','F#'],
+    }
+
     def __init__(self, data: dict):
         self._info: UGTabInfo = UGTabInfo(data)
         self._content_with_chords: str = self._format_content(data['store']['page']['data']['tab_view']['wiki_tab']['content'], fchords=False)
@@ -158,6 +173,8 @@ class UGChords(UGTab):
             self._content_with_chords: str = self._format_content(self._content_with_chords, fchords=True)
             return
         #FIXME: How to deal with sharps / flats
+        # idea: dictionary of all available chords, and all chords in every key
+        # { KEY: (FLAT/SHARP/NEITHER, [CHORDS]) }
         content = self._content_with_chords
         for c in self._chords_og:
             new_chord = c
@@ -191,11 +208,14 @@ class UGChords(UGTab):
             
         self._content = content
     
+    # def _
+
+
     def get_transposition(self) -> int:
         return self._transposition
     
     def get_formatted_metadata(self) -> str:
-        return super().get_formatted_metadata() + "\nTransposition: " + str(self.get_transposition())  
+        return super().get_formatted_metadata() + "\nTransposition: " + str(self.get_transposition())
 
 
 
