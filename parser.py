@@ -31,9 +31,9 @@ class UGTabInfo():
         
         # the following meta fields could be None
         tab_meta: dict = data['store']['page']['data']['tab_view']['meta']
-        self._tuning: str or None = tab_meta.get('tuning')['value'] if tab_meta.get('tuning') is not None else None
-        self._key: str or None = tab_meta.get('tonality')
-        self._capo: int or None = tab_meta.get('capo')
+        self._tuning: str or None = tab_meta.get('tuning')['value'] if type(tab_meta) is dict and tab_meta.get('tuning') is not None else None
+        self._key: str or None = tab_meta.get('tonality') if type(tab_meta) is dict else None
+        self._capo: int or None = tab_meta.get('capo') if type(tab_meta) is dict else None
     
     def get_tab_id(self) -> int:
         return self._tab_id
@@ -149,7 +149,7 @@ class UGChords(UGTab):
         self._info: UGTabInfo = UGTabInfo(data)
         self._content_with_chords: str = self._format_content(data['store']['page']['data']['tab_view']['wiki_tab']['content'], fchords=False)
         self._content: str = self._format_content(self._content_with_chords)
-        self._chords_og: list[str] = list(data['store']['page']['data']['tab_view']['applicature'].keys())
+        self._chords_og: list(str) = list(data['store']['page']['data']['tab_view']['applicature'].keys())
         self._transposition: int = 0
     
     def transpose(self, transposition: int = 0) -> None:
@@ -258,15 +258,15 @@ class UGSearch():
     and can return the Chords results or Tabs results.
 
     Instance Variables:
-    - raw_results:  list[dict]  | the search results as a list of results with data
+    - raw_results:  list(dict)  | the search results as a list of results with data
     """
     # TODO: maybe look into https://stats.stackexchange.com/questions/6418/rating-system-taking-account-of-number-of-votes
     sort_key = lambda x: x.get_votes()
 
     def __init__(self, data: dict):
-        self._raw_results: list[dict] = data["store"]["page"]["data"]["results"]
+        self._raw_results: list(dict) = data["store"]["page"]["data"]["results"]
 
-    def get_chords_results(self) -> list[UGSearchResult]: 
+    def get_chords_results(self): 
         """
         Returns a list of search results that are for Chords type results.
         Currently sorts the results by highest number of votes.
@@ -281,7 +281,7 @@ class UGSearch():
         ch_r.sort(reverse=True, key=UGSearch.sort_key)
         return ch_r
     
-    def get_tabs_results(self) -> list[UGSearchResult]:
+    def get_tabs_results(self):
         """
         Returns a list of search results that are for Tabs type results.
         Currently sorts the results by highest number of votes.
