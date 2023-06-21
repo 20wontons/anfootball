@@ -102,3 +102,9 @@ ENV/
 .mypy_cache/
 workspace/
 sample/sample_json/hide
+
+# repl.it
+poetry.lock
+pyproject.toml
+.replit
+replit.nix
