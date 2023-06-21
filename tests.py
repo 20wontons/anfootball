@@ -1,7 +1,7 @@
 import unittest
 
 
-import scraper
+import ug_scraper
 
 class TestScraper(unittest.TestCase):
     """
@@ -21,18 +21,18 @@ class TestScraper(unittest.TestCase):
         # scraper.write_dict_to_file(scraper.json_from_url("https://tabs.ultimate-guitar.com/tab/american-football/never-meant-chords-1701267"), 'sample/sample_json/never_meant.json')
 
     def test_invalid_link_raises_InvalidLinkError(self):
-        self.assertRaises(scraper.InvalidLinkError, scraper.json_from_url, 'https://www.google.com/')
-        self.assertRaises(scraper.InvalidLinkError, scraper.json_from_url, 'https://www.youtube.com/watch?v=rogKZtOhg44&list=LL&index=8&ab_channel=Astro%27s2ndchannel')
+        self.assertRaises(ug_scraper.InvalidLinkError, ug_scraper.json_from_url, 'https://www.google.com/')
+        self.assertRaises(ug_scraper.InvalidLinkError, ug_scraper.json_from_url, 'https://www.youtube.com/watch?v=rogKZtOhg44&list=LL&index=8&ab_channel=Astro%27s2ndchannel')
 
     def test_incorrect_link_raises_HTTPError(self):
-        self.assertRaises(scraper.requests.HTTPError, scraper.json_from_url, self.broken_url)
+        self.assertRaises(ug_scraper.requests.HTTPError, ug_scraper.json_from_url, self.broken_url)
     
     def test_link_returns_jsondict(self):
-        self.assertTrue(type(scraper.json_from_url(self.url)) == dict)
+        self.assertTrue(type(ug_scraper.json_from_url(self.url)) == dict)
 
 
 
-import parser
+import ug_parser
 
 class TestParser(unittest.TestCase):
     """
@@ -41,12 +41,12 @@ class TestParser(unittest.TestCase):
     """
     def setUp(self):
         f = open('sample/sample_json/chit_chat.json', 'r')
-        data = scraper.json.loads(f.read())
-        self.tab = parser.UGTab(data)
+        data = ug_scraper.json.loads(f.read())
+        self.tab = ug_parser.UGTab(data)
         
         f2 = open('sample/sample_json/bright.json', 'r')
-        data2 = scraper.json.loads(f2.read())
-        self.tab2 = parser.UGTab(data2)
+        data2 = ug_scraper.json.loads(f2.read())
+        self.tab2 = ug_parser.UGTab(data2)
 
         f.close()
         f2.close()

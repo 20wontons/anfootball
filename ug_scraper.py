@@ -8,6 +8,8 @@ _UG_TAB_URI = 'https://tabs.ultimate-guitar.com/tab/'
 _UG_TAB_URI_LEN = 37
 _UG_SEARCH_URI = "https://www.ultimate-guitar.com/search.php?search_type=title&value="
 _UG_SEARCH_URI_LEN = 67
+_UG_EXPLORE_URI = "https://www.ultimate-guitar.com/explore"
+_UG_EXPLORE_URI_LEN = 39
 
 SAMPLE_SEARCH="https://www.ultimate-guitar.com/search.php?search_type=title&value=beach%20weather%20chit%20chat"
 
@@ -73,6 +75,28 @@ def json_from_search(artist: str, song: str) -> dict:
     query = artist.strip() + " " + song.strip()
     url = _UG_SEARCH_URI + urllib.parse.quote(query)
     return json_from_url(url)
+
+
+def json_from_explore(option: str) -> dict:
+    """
+    Extracts the data_content attribute from 
+    the url's html, to access the page's data.
+
+    Parameters:
+    - artist:   the artist name
+    - song:     the song name
+    
+    Returns:
+    - the JSON dict of the tab data
+
+    Exceptions:
+    - HTTPError:    if the page request does not return a successful
+                    status code (200-299) then this exception will be raised
+    - InvalidLinkError: Raised when the link is not an ultimate-guitar tab link.
+    """
+    query = option.strip()
+    url = _UG_EXPLORE_URI + "?order=" + urllib.parse.quote(query)
+    return json_from_url(url)
     
 
 
@@ -87,6 +111,6 @@ def write_dict_to_file(data: dict, path: str) -> None:
 def _link_has_ug_uri(url: str) -> bool:
     """Checks if the given URL contains an ultimate-guitar tab or search URI."""
     try:
-        return url[:_UG_TAB_URI_LEN] == _UG_TAB_URI or url[:_UG_SEARCH_URI_LEN] == _UG_SEARCH_URI
+        return url[:_UG_TAB_URI_LEN] == _UG_TAB_URI or url[:_UG_EXPLORE_URI_LEN] == _UG_EXPLORE_URI or url[:_UG_SEARCH_URI_LEN] == _UG_SEARCH_URI
     except IndexError:
         return False

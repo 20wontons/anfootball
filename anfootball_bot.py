@@ -6,8 +6,8 @@ import asyncio
 
 from server import keep_alive
 
-from scraper import json_from_search, json_from_url, InvalidLinkError, requests
-from parser import UGTab, UGSearch, UGSearchResult, UGChords
+from ug_scraper import json_from_search, json_from_url, json_from_explore, InvalidLinkError, requests
+from ug_parser import UGTab, UGSearch, UGSearchResult, UGChords, UGExplore
 
 UG_YELLOW = 0xffc600
 
@@ -47,10 +47,10 @@ async def on_ready():
 
 @bot.command(
     name = "ping",
-    description = "Pings the bot.",
+    description = "Pings the bot and returns the latency.",
 )
 async def ping(ctx):
-    await ctx.send("Pong!")
+    await ctx.send(f"Pong! `{round(bot.latency)}ms`")
 
 
 
@@ -274,15 +274,14 @@ async def tabs(ctx, artist: str, song: str):
 )
 async def search(ctx: interactions.context._Context, sub_command: str, artist: str, song: str):
     try:
-        # Gets the highest voted 5 chord results and 5 tab results
         ugsearch = UGSearch(json_from_search(artist, song))
 
         if sub_command == "all":
-            results = ugsearch.get_chords_results()[:5] + ugsearch.get_tabs_results()[:5]
+            results = ugsearch.get_results(10)
         elif sub_command == "chords":
-            results = ugsearch.get_chords_results()[:10]
+            results = ugsearch.get_chords_results(10)
         elif sub_command == "tabs":
-            results = ugsearch.get_tabs_results()[:10]
+            results = ugsearch.get_tabs_results(10)
         
         results_embeds = _format_results_embeds(results)
         
@@ -334,6 +333,106 @@ async def search(ctx: interactions.context._Context, sub_command: str, artist: s
     #     await ctx.send("Something went wrong.", ephemeral=True)
 
 
+@bot.command(
+    name = "explore",
+    description = "Explore tabs on Ultimate-Guitar.",
+    options = [
+        interactions.Option(
+            name = "today",
+            description = "Today's most popular tabs.",
+            type = interactions.OptionType.SUB_COMMAND
+        ),
+        interactions.Option(
+            name = "popular",
+            description = "Alltime popular tabs.",
+            type = interactions.OptionType.SUB_COMMAND
+        ),
+        interactions.Option(
+            name = "recent",
+            description = "Recently added tabs.",
+            type = interactions.OptionType.SUB_COMMAND,
+        ),
+        interactions.Option(
+            name = "rating",
+            description = "Highest rated tabs.",
+            type = interactions.OptionType.SUB_COMMAND,
+        )
+    ],
+)
+async def explore(ctx: interactions.context._Context, sub_command: str):
+    try:
+        if sub_command == "today":
+            option = "hitsdailygroup_desc"
+        elif sub_command == "popular":
+            option = "hitstotal_desc"
+        elif sub_command == "recent":
+            option = "date_desc"
+        elif sub_command == "rating":
+            option = "rating_desc"
+        
+        # Gets the highest voted 5 chord results and 5 tab results
+        ugexplore = UGExplore(json_from_explore(option))
+        results = ugexplore.get_results(10)
+        
+        results_embeds = _format_results_embeds(results)
+        
+        page = 0
+        PAGE_MAX = len(results_embeds)-1
+        search_row.components[0].disabled = True
+        search_row.components[2].disabled = page == PAGE_MAX
+
+        await ctx.send(embeds=results_embeds[page], components=search_row)
+        
+        # TODO: close brings back to the pagination
+        try:
+            while True:
+                # Waiting for the button click
+                button_ctx: interactions.ComponentContext = await bot.wait_for_component(
+                    components=[search_left_button, search_choose_button, search_right_button], 
+                    timeout=60
+                )
+                if button_ctx.custom_id == "next":
+                    page += 1
+                elif button_ctx.custom_id == "prev":
+                    page -= 1
+                elif button_ctx.custom_id == "choose":
+                    break
+
+                search_row.components[0].disabled=page == 0
+                search_row.components[2].disabled=page == PAGE_MAX
+
+                await button_ctx.edit(embeds=results_embeds[page], components=search_row)
+        except asyncio.TimeoutError:
+            return await ctx.edit(embeds=results_embeds[page], components=[])
+        
+        
+        url = results[page].get_tab_url()
+        ugtab = UGTab(json_from_url(url))
+
+        embed = _format_tab_embed(ugtab)
+
+        tab_row.components[0].url = url
+        
+        await button_ctx.edit(embeds=embed, components=tab_row)
+
+        button_ctx = await bot.wait_for_component(
+            components=[close_button],
+            timeout=None
+        )
+        await button_ctx.edit(embeds=results_embeds[page], components=[])
+
+            
+
+    except requests.HTTPError as e:
+        # Ephemeral message for unsuccessful HTTP connections
+        await ctx.send(f"Unsuccessful connection: {e}. Try again later.", ephemeral=True)
+    # except Exception as e:
+    #     # Ephemeral message for all other errors
+    #     print(e)
+    #     await ctx.send("Something went wrong.", ephemeral=True)
+
+
+
 
 def _format_tab_embed(ugtab: UGTab) -> interactions.Embed:
     """Formats the tab to be an embed."""
@@ -381,7 +480,7 @@ search_left_button = interactions.Button(
     custom_id="prev"
 )
 search_choose_button = interactions.Button(
-    style=interactions.ButtonStyle.PRIMARY, 
+    style=interactions.ButtonStyle.SUCCESS, 
     label="Display",
     custom_id="choose"
 )
@@ -390,6 +489,22 @@ search_row = interactions.ActionRow(
         search_left_button, 
         search_choose_button, 
         search_right_button
+    ]
+)
+
+link_button = interactions.Button(
+    style=interactions.ButtonStyle.LINK, 
+    label="Open in UG"
+)
+close_button = interactions.Button(
+    style=interactions.ButtonStyle.DANGER, 
+    label="Close",
+    custom_id="close"
+)
+tab_row = interactions.ActionRow(
+    components=[
+        link_button, 
+        close_button
     ]
 )
 

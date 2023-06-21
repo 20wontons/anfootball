@@ -15,8 +15,9 @@ Do not include `<>` , `[]` or `\` when executing the command.
 | `/chords <artist> <song> [transpose]` | Finds the highest voted Chords tab for a song.<br>Transpose to change the key of the song `(beta)`. |
 | `/tabs <artist> <song>` | Finds the highest voted Tabs tab for a song. |
 | `/search <all\chords\tabs> <artist> <song>` | Search for a song. |
+| `/explore <today\popular\recent\rating>` | Explore tabs on Ultimate-Guitar. |
 | `/nevermeant` | The americ anfootball lick. |
-| `/ping` | Pings the bot. |
+| `/ping` | Pings the bot and returns the latency. |
 
 
 ## Images
@@ -45,6 +46,7 @@ Do not include `<>` , `[]` or `\` when executing the command.
 
 * [X] Create a Discord bot that can produce output
     * Successfully pinged and received a "Pong!" (2022/09/10)
+        * Added bot response latency in milliseconds to `/ping` (2023/06/20)
 * [X] The bot can receive input and produce output
     * Successfully able to receive input and respond (2022/09/11)
 * [X] The bot can display chord/lyric format
@@ -70,12 +72,17 @@ Do not include `<>` , `[]` or `\` when executing the command.
 
 * [X] Allow for transposition of songs
     * Chords can now be transposed by the `transpose:` option in `/chords`, but needs work on dealing with sharps and flats (2022/09/19)
+    * [ ] Make transpose a pair of buttons on the tab embed rather than an input field
 * [X] Support for Tabs. Differentiated from chords by the search results and lack of transposition ability
     * Added `/tabs` (2022/09/15)
 * [X] Subcommands for search: search chords and search tabs
     * Main search function renamed to `/search all` and added `/search chords` and `/search tabs`
-* [ ] Able to display a specific Chords/Tabs tab by ID
-* [ ] Add a function to browse top 10 popular today and all time
+    * [ ] Close brings back to search
+* ~~[ ] Able to display a specific Chords/Tabs tab by ID~~
+    * Not able to search by ID, checked (2023/06/20)
+* [X] Add a function to browse top 10 popular today and all time (2023/06/20)
+    * `/explore` function added: `/explore today`, `/explore popular`, `/explore recent`, and `/explore rating`
+    * [ ] Close brings back to browse
 * [ ] Search for an artist, able to return most popular songs, or most recent tabs
 
 
@@ -108,3 +115,8 @@ Do not include `<>` , `[]` or `\` when executing the command.
     ```
 
     **Note:** `discord.py` is not used for slash commands so `pip install -U discord.py` is not needed. 
+
+1. Run the bot:
+    ```cmd
+    python anfootball_bot.py
+    ```

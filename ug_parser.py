@@ -145,20 +145,20 @@ class UGChords(UGTab):
     """
     tonalities = ["A","Bb","B","C","Db","D","Eb","E","F","Gb","G","Ab"]
 
-    keys = {
-        'Ab': ['Ab','Bb','C','Db','Eb','F','G'],
-        'A': ['A','B','C#','D','E','F#','G#'],
-        'Bb': ['Bb','C','D','Eb','F','G','A'],
-        'B': ['B','C#','D#','E','F#','G#','A#'],
-        'C': ['C','D','E','F','G','A','B'],
-        'Db': ['Db','Eb','F','Gb','Ab','Bb','C'],
-        'D': ['D','E','F#','G','A','B','C#'],
-        'Eb': ['Eb','F','G','Ab','Bb','C','D'],
-        'E': ['E','F#','G#','A','B','C#','D#'],
-        'F': ['F','G','A','Bb','C','D','E'],
-        'F#': ['F#','G#','A#','B','C#','D#','E#'],
-        'G': ['G','A','B','C','D','E','F#'],
-    }
+    # keys = {
+    #     'Ab': ['Ab','Bb','C','Db','Eb','F','G'],
+    #     'A': ['A','B','C#','D','E','F#','G#'],
+    #     'Bb': ['Bb','C','D','Eb','F','G','A'],
+    #     'B': ['B','C#','D#','E','F#','G#','A#'],
+    #     'C': ['C','D','E','F','G','A','B'],
+    #     'Db': ['Db','Eb','F','Gb','Ab','Bb','C'],
+    #     'D': ['D','E','F#','G','A','B','C#'],
+    #     'Eb': ['Eb','F','G','Ab','Bb','C','D'],
+    #     'E': ['E','F#','G#','A','B','C#','D#'],
+    #     'F': ['F','G','A','Bb','C','D','E'],
+    #     'F#': ['F#','G#','A#','B','C#','D#','E#'],
+    #     'G': ['G','A','B','C','D','E','F#'],
+    # }
 
     def __init__(self, data: dict):
         self._info: UGTabInfo = UGTabInfo(data)
@@ -173,8 +173,6 @@ class UGChords(UGTab):
             self._content_with_chords: str = self._format_content(self._content_with_chords, fchords=True)
             return
         #FIXME: How to deal with sharps / flats
-        # idea: dictionary of all available chords, and all chords in every key
-        # { KEY: (FLAT/SHARP/NEITHER, [CHORDS]) }
         content = self._content_with_chords
         for c in self._chords_og:
             new_chord = c
@@ -207,8 +205,6 @@ class UGChords(UGTab):
             )
             
         self._content = content
-    
-    # def _
 
 
     def get_transposition(self) -> int:
@@ -286,11 +282,28 @@ class UGSearch():
     def __init__(self, data: dict):
         self._raw_results: list[dict] = data["store"]["page"]["data"]["results"]
 
-    def get_chords_results(self) -> list[UGSearchResult]: 
+    def get_results(self, num: int) -> list[UGSearchResult]:
+        """
+        Returns a list of search results.
+        Currently sorts the results by highest number of votes.
+        """
+        assert num > 0
+        s_r = []
+        for r in self._raw_results:
+            try:
+                if r['type'] == "Chords" or r['type'] == "Tabs":
+                    s_r.append(UGSearchResult(r))
+            except KeyError:
+                pass
+        s_r.sort(reverse=True, key=UGSearch.sort_key)
+        return s_r[:num]
+
+    def get_chords_results(self, num: int) -> list[UGSearchResult]: 
         """
         Returns a list of search results that are for Chords type results.
         Currently sorts the results by highest number of votes.
         """
+        assert num > 0
         ch_r = []
         for r in self._raw_results:
             try:
@@ -299,13 +312,14 @@ class UGSearch():
             except KeyError:
                 pass
         ch_r.sort(reverse=True, key=UGSearch.sort_key)
-        return ch_r
+        return ch_r[:num]
     
-    def get_tabs_results(self) -> list[UGSearchResult]:
+    def get_tabs_results(self, num: int) -> list[UGSearchResult]:
         """
         Returns a list of search results that are for Tabs type results.
         Currently sorts the results by highest number of votes.
         """
+        assert num > 0
         t_r = []
         for r in self._raw_results:
             try:
@@ -314,4 +328,8 @@ class UGSearch():
             except KeyError:
                 pass
         t_r.sort(reverse=True, key=UGSearch.sort_key)
-        return t_r
+        return t_r[:num]
+    
+class UGExplore(UGSearch):
+    def __init__(self, data: dict):
+        self._raw_results: list[dict] = data["store"]["page"]["data"]["data"]["tabs"]
