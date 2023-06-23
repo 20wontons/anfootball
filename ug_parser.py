@@ -265,6 +265,21 @@ class UGSearchResult():
                 + f"**Votes:** `{self._votes}`\n\n" \
                 + f"**ID:** `{self._tab_id}`\n" \
                 + f"**Link**\n{self._tab_url}"
+    
+
+class UGArtist():
+    def __init__(self, data: dict):
+        self._artist: str = data['artist_name']
+        self._artist_url: str = data['artist_url']
+    
+    def get_artist(self) -> str:
+        return self._artist
+    
+    def get_artist_url(self) -> str:
+        return self._artist_url
+    
+    def get_formatted_result_description(self) -> str:
+        return f"**Link**\n{'https://www.ultimate-guitar.com' + self._artist_url}"
 
 
 class UGSearch():
@@ -280,7 +295,10 @@ class UGSearch():
     sort_key = lambda x: x.get_votes()
 
     def __init__(self, data: dict):
-        self._raw_results: list[dict] = data["store"]["page"]["data"]["results"]
+        try:
+            self._raw_results: list[dict] = data["store"]["page"]["data"]["results"]
+        except KeyError:
+            self._raw_results: list[dict] = data["store"]["page"]["data"]["other_tabs"]
 
     def get_results(self, num: int) -> "list[UGSearchResult]":
         """
@@ -330,6 +348,16 @@ class UGSearch():
         t_r.sort(reverse=True, key=UGSearch.sort_key)
         return t_r[:num]
     
-class UGExplore(UGSearch):
+    def get_artists_results(self, num: int) -> "list[UGArtist]":
+        """
+        Returns a list of artist results.
+        """
+        assert num > 0
+        a_r = []
+        for r in self._raw_results:
+            a_r.append(UGArtist(r))
+        return a_r[:num]
+    
+class UGExplore(UGSearch): #TODO: still sorts by votes, turn sorting off
     def __init__(self, data: dict):
         self._raw_results: list[dict] = data["store"]["page"]["data"]["data"]["tabs"]

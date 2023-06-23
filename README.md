@@ -22,14 +22,45 @@ Do not include `<>` , `[]` or `\` when executing the command.
 
 ## Images
 
-<img src="https://pbs.twimg.com/media/FdeYINYUYAAz4Dv?format=png&name=small" width=300 alt="/chords artist:Hot Mulligan song:Pop Shuvit Hall of Meat Duh"/>
-<br>
-<img src="https://pbs.twimg.com/media/FdeYOJ7UUAA9hhZ?format=png&name=small" width=300 alt="/tabs artist:Chinese Football song: Electronic Girl"/>
-<br>
-<img src="https://pbs.twimg.com/media/FdeYd46UUAAVG7J?format=png&name=small" width=300 alt="/search all artist:Jimmy Eat World song:The Middle"/>
+<img src="https://pbs.twimg.com/media/FdeYINYUYAAz4Dv?format=png&name=small" height=300 alt="/chords artist:Hot Mulligan song:Pop Shuvit Hall of Meat Duh"/>
+<img src="https://pbs.twimg.com/media/FdeYOJ7UUAA9hhZ?format=png&name=small" height=300 alt="/tabs artist:Chinese Football song: Electronic Girl"/>
+<img src="https://pbs.twimg.com/media/FdeYd46UUAAVG7J?format=png&name=small" height=300 alt="/search all artist:Jimmy Eat World song:The Middle"/>
 
 
+## References
 
+* https://github.com/joncardasis/ultimate-api
+    * found to be incompatible with ultimate guitar (checked on 2022/09/09)
+* https://realpython.com/beautiful-soup-web-scraper-python/
+* https://discord-py-slash-command.readthedocs.io/en/latest/quickstart.html
+* https://github.com/interactions-py
+
+
+## Setup
+1. Install python3 from https://www.python.org/downloads/
+
+1. Create a virtual environment of python3 in the anfootball folder:
+
+    ```cmd
+    pip install virtualenv
+    virtualenv venv
+    .\venv\Scripts\activate
+    ```
+
+1. Install dependencies:
+    
+    ```cmd
+    pip install -r requirements.txt
+    pip install -U discord-py-interactions
+    pip install -U interactions-wait-for
+    ```
+
+    **Note:** `discord.py` is not used for slash commands so `pip install -U discord.py` is not needed. 
+
+1. Run the bot:
+    ```cmd
+    python anfootball_bot.py
+    ```
 
 ## Sprints
 
@@ -77,46 +108,12 @@ Do not include `<>` , `[]` or `\` when executing the command.
     * Added `/tabs` (2022/09/15)
 * [X] Subcommands for search: search chords and search tabs
     * Main search function renamed to `/search all` and added `/search chords` and `/search tabs`
-    * [ ] Close brings back to search
-* ~~[ ] Able to display a specific Chords/Tabs tab by ID~~
-    * Not able to search by ID, checked (2023/06/20)
+    * [X] Close brings back to search
+* [ ] Able to display a specific Chords/Tabs tab by ID
+    * ~~Not able to search by ID, checked (2023/06/20)~~
+    * Use `https://tabs.ultimate-guitar.com/tab/print?id=` which redirects to the tab page
 * [X] Add a function to browse top 10 popular today and all time (2023/06/20)
     * `/explore` function added: `/explore today`, `/explore popular`, `/explore recent`, and `/explore rating`
-    * [ ] Close brings back to browse
-* [ ] Search for an artist, able to return most popular songs, or most recent tabs
-
-
-## References
-
-* https://github.com/joncardasis/ultimate-api
-    * found to be incompatible with ultimate guitar (checked on 2022/09/09)
-* https://realpython.com/beautiful-soup-web-scraper-python/
-* https://discord-py-slash-command.readthedocs.io/en/latest/quickstart.html
-* https://github.com/interactions-py
-
-
-## Setup
-1. Install python3 from https://www.python.org/downloads/
-
-1. Create a virtual environment of python3 in the anfootball folder:
-
-    ```cmd
-    pip install virtualenv
-    virtualenv venv
-    .\venv\Scripts\activate
-    ```
-
-1. Install dependencies:
-    
-    ```cmd
-    pip install -r requirements.txt
-    pip install -U discord-py-interactions
-    pip install -U interactions-wait-for
-    ```
-
-    **Note:** `discord.py` is not used for slash commands so `pip install -U discord.py` is not needed. 
-
-1. Run the bot:
-    ```cmd
-    python anfootball_bot.py
-    ```
+    * [X] Close brings back to browse
+* [X] Search for an artist, able to return most popular songs
+    * Issue with pagination: how to handle artists that have a lot of tabs
