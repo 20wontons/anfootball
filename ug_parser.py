@@ -282,7 +282,7 @@ class UGSearch():
     def __init__(self, data: dict):
         self._raw_results: list[dict] = data["store"]["page"]["data"]["results"]
 
-    def get_results(self, num: int) -> list[UGSearchResult]:
+    def get_results(self, num: int) -> "list[UGSearchResult]":
         """
         Returns a list of search results.
         Currently sorts the results by highest number of votes.
@@ -298,7 +298,7 @@ class UGSearch():
         s_r.sort(reverse=True, key=UGSearch.sort_key)
         return s_r[:num]
 
-    def get_chords_results(self, num: int) -> list[UGSearchResult]: 
+    def get_chords_results(self, num: int) -> "list[UGSearchResult]": 
         """
         Returns a list of search results that are for Chords type results.
         Currently sorts the results by highest number of votes.
@@ -314,7 +314,7 @@ class UGSearch():
         ch_r.sort(reverse=True, key=UGSearch.sort_key)
         return ch_r[:num]
     
-    def get_tabs_results(self, num: int) -> list[UGSearchResult]:
+    def get_tabs_results(self, num: int) -> "list[UGSearchResult]":
         """
         Returns a list of search results that are for Tabs type results.
         Currently sorts the results by highest number of votes.

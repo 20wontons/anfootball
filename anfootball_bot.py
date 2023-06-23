@@ -18,7 +18,7 @@ load_dotenv()
 
 # token is in a file called .env
 # TOKEN = '<BOT_TOKEN>'
-_token = os.getenv('TOKEN')
+_token = os.environ['TOKEN']
 _ready: bool = False
 
 bot = interactions.Client(token=_token)
@@ -453,7 +453,7 @@ def _format_tab_embed(ugtab: UGTab) -> interactions.Embed:
 
 
 
-def _format_results_embeds(results: list[UGSearchResult]) -> list[interactions.Embed]:
+def _format_results_embeds(results: "list[UGSearchResult]") -> "list[interactions.Embed]":
     """Formats the results listing to be embeds."""
     results_embeds = []
     for i in range(len(results)):
