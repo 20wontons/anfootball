@@ -7,7 +7,7 @@ import asyncio
 from server import keep_alive
 
 from ug_scraper import json_from_search, json_from_url, json_from_explore, InvalidLinkError, requests
-from ug_parser import UGTab, UGSearch, UGSearchResult, UGChords, UGExplore
+from ug_parser import UGTab, UGSearch, UGSearchResult, UGChords, UGExplore, UGArtist
 
 UG_YELLOW = 0xffc600
 
@@ -95,12 +95,15 @@ F|------------------------------------------|
         except asyncio.TimeoutError:
             return await ctx.edit(components=[])
 
-    except InvalidLinkError:
+    except InvalidLinkError as e:
         # Ephemeral message for invalid Links
-        await ctx.send("This is not a valid `tabs.ultimate-guitar.com/tabs/` link.", ephemeral=True)
+        await ctx.send(e, ephemeral=True)
     except requests.HTTPError as e:
         # Ephemeral message for unsuccessful HTTP connections
-        await ctx.send(e, ephemeral=True)
+        if e.response.status_code == 404:
+            await ctx.send(f"Tab not found.", ephemeral=True)
+        else:
+            await ctx.send(f"Unsuccessful connection: {e}. Try again later.", ephemeral=True)
     # except Exception as e:
     #     # Ephemeral message for all other errors
     #     print(e)
@@ -148,20 +151,22 @@ nm_display_full_button = interactions.Button(
 async def chords(ctx, artist: str, song: str, transpose: int = 0): #url: str
     try:
         # Takes the first result in the sorted results listing.
-        url = UGSearch(json_from_search(artist, song)).get_chords_results()[0].get_tab_url()
+        url = UGSearch(json_from_search(artist, song)).get_chords_results(1)[0].get_tab_url()
         ugchords = UGChords(json_from_url(url))
         ugchords.transpose(transpose)
         
         embed = _format_tab_embed(ugchords)
         
         await ctx.send(embeds=embed)
-    except InvalidLinkError:
+    except InvalidLinkError as e:
         # Ephemeral message for invalid Links
-        await ctx.send("This is not a valid `tabs.ultimate-guitar.com/tabs/` link.", ephemeral=True)
+        await ctx.send(e, ephemeral=True)
     except requests.HTTPError as e:
         # Ephemeral message for unsuccessful HTTP connections
-        # TODO: say 404 error is tab not found
-        await ctx.send(f"Unsuccessful connection: {e}. Try again later.", ephemeral=True)
+        if e.response.status_code == 404:
+            await ctx.send(f"Tab not found.", ephemeral=True)
+        else:
+            await ctx.send(f"Unsuccessful connection: {e}. Try again later.", ephemeral=True)
     # except Exception as e:
     #     # Ephemeral message for all other errors
     #     print(e)
@@ -190,18 +195,21 @@ async def chords(ctx, artist: str, song: str, transpose: int = 0): #url: str
 async def tabs(ctx, artist: str, song: str):
     try:
         # Takes the first result in the sorted results listing.
-        url = UGSearch(json_from_search(artist, song)).get_tabs_results()[0].get_tab_url()
+        url = UGSearch(json_from_search(artist, song)).get_tabs_results(1)[0].get_tab_url()
         ugtabs = UGTab(json_from_url(url))
 
         embed = _format_tab_embed(ugtabs)
         
         await ctx.send(embeds=embed)
-    except InvalidLinkError:
+    except InvalidLinkError as e:
         # Ephemeral message for invalid Links
-        await ctx.send("This is not a valid `tabs.ultimate-guitar.com/tabs/` link.", ephemeral=True)
+        await ctx.send(e, ephemeral=True)
     except requests.HTTPError as e:
         # Ephemeral message for unsuccessful HTTP connections
-        await ctx.send(f"Unsuccessful connection: {e}. Try again later.", ephemeral=True)
+        if e.response.status_code == 404:
+            await ctx.send(f"Tab not found.", ephemeral=True)
+        else:
+            await ctx.send(f"Unsuccessful connection: {e}. Try again later.", ephemeral=True)
     # except Exception as e:
     #     # Ephemeral message for all other errors
     #     print(e)
@@ -269,12 +277,63 @@ async def tabs(ctx, artist: str, song: str):
                     required = True
                 ),
             ]
+        ),
+        interactions.Option(
+            name = "artist",
+            description = "Search for a band/artist's chords and tabs.",
+            type = interactions.OptionType.SUB_COMMAND,
+            options = [
+                interactions.Option(
+                    name = "artist",
+                    description = "The artist name",
+                    type = interactions.OptionType.STRING,
+                    required = True
+                ),
+            ]
         )
     ],
 )
-async def search(ctx: interactions.context._Context, sub_command: str, artist: str, song: str):
+async def search(ctx: interactions.context._Context, sub_command: str, artist: str, song: str = None):
     try:
-        ugsearch = UGSearch(json_from_search(artist, song))
+        if sub_command == "artist":
+            ugsearch = UGSearch(json_from_search(artist))
+            results = ugsearch.get_artists_results(10)
+            results_embeds = _format_results_embeds(results)
+            
+            page = 0
+            PAGE_MAX = len(results_embeds)-1
+            search_row.components[0].disabled = True
+            search_row.components[2].disabled = page == PAGE_MAX
+
+            await ctx.send(embeds=results_embeds[page], components=search_row)
+            
+            try:
+                while True:
+                    # Waiting for the button click
+                    button_ctx: interactions.ComponentContext = await bot.wait_for_component(
+                        components=[search_left_button, search_choose_button, search_right_button], 
+                        timeout=60
+                    )
+                    if button_ctx.custom_id == "next":
+                        page += 1
+                    elif button_ctx.custom_id == "prev":
+                        page -= 1
+                    elif button_ctx.custom_id == "choose":
+                        break
+
+                    search_row.components[0].disabled=page == 0
+                    search_row.components[2].disabled=page == PAGE_MAX
+
+                    await button_ctx.edit(embeds=results_embeds[page], components=search_row)
+            except asyncio.TimeoutError:
+                return await ctx.edit(embeds=results_embeds[page], components=[])
+            
+            url = "https://www.ultimate-guitar.com" + results[page].get_artist_url()
+            ugsearch = UGSearch(json_from_url(url))
+            sub_command = "all"
+            await ctx.edit(embeds=results_embeds[page], components=[])
+        else:
+            ugsearch = UGSearch(json_from_search(artist, song))
 
         if sub_command == "all":
             results = ugsearch.get_results(10)
@@ -318,15 +377,26 @@ async def search(ctx: interactions.context._Context, sub_command: str, artist: s
         ugtab = UGTab(json_from_url(url))
 
         embed = _format_tab_embed(ugtab)
+
+        tab_row.components[0].url = url
         
-        await ctx.edit(embeds=embed, components=[])
+        await button_ctx.edit(embeds=embed, components=tab_row)
+
+        button_ctx = await bot.wait_for_component(
+            components=[close_button],
+            timeout=None
+        )
+        await button_ctx.edit(embeds=results_embeds[page], components=[])
         
-    except InvalidLinkError:
+    except InvalidLinkError as e:
         # Ephemeral message for invalid Links
-        await ctx.send("This is not a valid `tabs.ultimate-guitar.com/tabs/` link.", ephemeral=True)
+        await ctx.send(e, ephemeral=True)
     except requests.HTTPError as e:
         # Ephemeral message for unsuccessful HTTP connections
-        await ctx.send(f"Unsuccessful connection: {e}. Try again later.", ephemeral=True)
+        if e.response.status_code == 404:
+            await ctx.send(f"Tab not found.", ephemeral=True)
+        else:
+            await ctx.send(f"Unsuccessful connection: {e}. Try again later.", ephemeral=True)
     # except Exception as e:
     #     # Ephemeral message for all other errors
     #     print(e)
@@ -425,7 +495,10 @@ async def explore(ctx: interactions.context._Context, sub_command: str):
 
     except requests.HTTPError as e:
         # Ephemeral message for unsuccessful HTTP connections
-        await ctx.send(f"Unsuccessful connection: {e}. Try again later.", ephemeral=True)
+        if e.response.status_code == 404:
+            await ctx.send(f"Tab not found.", ephemeral=True)
+        else:
+            await ctx.send(f"Unsuccessful connection: {e}. Try again later.", ephemeral=True)
     # except Exception as e:
     #     # Ephemeral message for all other errors
     #     print(e)
@@ -453,16 +526,23 @@ def _format_tab_embed(ugtab: UGTab) -> interactions.Embed:
 
 
 
-def _format_results_embeds(results: list[UGSearchResult]) -> list[interactions.Embed]:
+def _format_results_embeds(results: "list[UGSearchResult | UGArtist]") -> "list[interactions.Embed]":
     """Formats the results listing to be embeds."""
     results_embeds = []
     for i in range(len(results)):
         r = results[i]
-        embed = interactions.Embed(
-            title = r.get_artist() + " - " + r.get_song() + " (" + r.get_type() + ")",
-            description = r.get_formatted_result_description(),
-            color = UG_YELLOW
-        )
+        if type(r) is UGSearchResult:
+            embed = interactions.Embed(
+                title = r.get_artist() + " - " + r.get_song() + " (" + r.get_type() + ")",
+                description = r.get_formatted_result_description(),
+                color = UG_YELLOW
+            )
+        elif type(r) is UGArtist:
+            embed = interactions.Embed(
+                title = r.get_artist(),
+                description = r.get_formatted_result_description(),
+                color = UG_YELLOW
+            )
         embed.set_footer(text=str(i+1)+"/"+str(len(results)))
         results_embeds.append(embed)
     return results_embeds
